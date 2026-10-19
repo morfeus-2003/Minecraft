@@ -76,7 +76,7 @@ end
 
 
 local function main()
-	if width % 0 ~= 0 then
+	if width % 2 ~= 0 then
 		error("Width must be even")
 		return
 	end
