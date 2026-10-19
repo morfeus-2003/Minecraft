@@ -12,19 +12,14 @@ end
 
 local function isGrownWheat()
 	local ok, block = turtle.inspectDown()
-	local returnValue = ok
+
+	return ok
 		and block.name == "minecraft:wheat"
 		and block.state.age == 7
-
-	if returnValue then print("This is grown wheat") end
-
-	return returnValue
 end
 
 local function blockBelowEmpty()
 	local ok, _ = turtle.inspectDown()
-
-	if not ok then print("This block is empty") end
 
 	return not ok
 end
@@ -36,13 +31,11 @@ local function trySelectSeeds()
 			return true
 		end
 	end
-	print("No seeds!?")
 	return false
 end
 
 local function plantIfNeeded()
 	if (isGrownWheat() or blockBelowEmpty()) and trySelectSeeds() then
-		print("OMG: imma place some wheat")
 		turtle.digDown()
 		turtle.placeDown()
 	end
