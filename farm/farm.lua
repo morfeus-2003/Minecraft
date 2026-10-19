@@ -19,7 +19,7 @@ end
 
 local function blockBelowEmpty()
 	local ok, _ = turtle.inspectDown()
-	return ok
+	return not ok
 end
 
 local function trySelectSeeds()
@@ -33,17 +33,10 @@ local function trySelectSeeds()
 end
 
 local function plantIfNeeded()
-	if not (isGrownWheat() and blockBelowEmpty()) then
-		return
+	if (isGrownWheat() or blockBelowEmpty()) and trySelectSeeds() then
+		turtle.digDown()
+		turtle.placeDown()
 	end
-
-	if turtle.selected() ~= "mincraft:seeds" then
-		if not trySelectSeeds() then
-			return
-		end
-	end
-
-	turtle.placeDown()
 end
 
 
