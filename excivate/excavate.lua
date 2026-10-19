@@ -51,7 +51,7 @@ end
 
 local function shouldReturnToBase(position)
     while distanceToBase(position) >= turtle.getFuelLevel() do
-        if ~tryRefuel() then
+        if not tryRefuel() then
             return true
         end
     end
@@ -59,7 +59,7 @@ local function shouldReturnToBase(position)
 end
 
 local function moveForwardUnsafe(position, direction)
-    if ~turtle.forward() then return false end
+    if not turtle.forward() then return false end
 
     position.x = position.x + (direction == EAST and 1 or (direction == WEST and -1 or 0))
     position.y = position.y + (direction == NORTH and 1 or (direction == SOUTH and -1 or 0))
@@ -74,7 +74,7 @@ local function moveForwardSafe(position, direction, breakBlocks)
     end
 
     if breakBlocks then
-        while ~moveForwardUnsafe(position, direction) do
+        while not moveForwardUnsafe(position, direction) do
             turtle.dig()
         end
         return true
