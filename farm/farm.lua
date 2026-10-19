@@ -1,6 +1,8 @@
-local depth = arg[1]
-local width = arg[2]
-local waitTime = arg[3]
+local depth = tonumber(arg[1])
+local width = tonumber(arg[2])
+local waitTime = tonumber(arg[3])
+
+local BREAD = "minecraft:bread"
 
 local function wait(time)
 	for i=time,1,-1 do
@@ -8,6 +10,18 @@ local function wait(time)
 		sleep(1)
 		term.clear()
 	end
+end
+
+local function countItem(itemName)
+	local sum = 0
+	local item = nil
+	for i=1,16 do
+		item = turtle.getItemDetail(i)
+		if item and item.name == itemName then
+			sum = sum + turtle.getItemCount(i)
+		end
+	end
+	return sum
 end
 
 local function isGrownWheat()
@@ -25,12 +39,15 @@ local function blockBelowEmpty()
 end
 
 local function trySelectSeeds()
+	local item = nil
 	for i=1,16 do
-		if turtle.getItemDetail(i) and turtle.getItemDetail(i).name == "minecraft:seeds" then
+		item = turtle.getItemDetail(i)
+		if item and item.name == "minecraft:wheat_seeds" then
 			turtle.select(i)
 			return true
 		end
 	end
+	print("no seeds")
 	return false
 end
 
@@ -39,6 +56,36 @@ local function plantIfNeeded()
 		turtle.digDown()
 		turtle.placeDown()
 	end
+end
+
+local function moveSeedsOutOfBuildArea()
+	trySelectSeeds()
+	turtle.transferTo(16)
+end
+
+local function throwAllButOneSeed()
+	local hasSavedOne = false
+	local item
+	for i=16,1,-1 do
+		item = turtle.getItemDetail(i)
+		if item and item.name == "minecraft:wheat_seeds" then
+			turtle.select(i)
+			turtle.drop(turtle.getItemCount(i) - (hasSavedOne and 1 or 0))
+			hasSavedOne = true
+		end
+	end
+end
+
+local function tryMakeBread()
+	if countItem(BREAD) < 3 then return false end
+
+	moveSeedsOutOfBuildArea()
+	throwAllButOneSeed()
+
+
+
+
+
 end
 
 
@@ -62,8 +109,8 @@ local function farmField()
 end
 
 local function returnAfterfarm()
-	turtle.turnLeft()
-	for i=1,width do
+		turtle.turnRight()
+	for i=1,width + 1 do
 		turtle.forward()
 	end
 	turtle.turnLeft()
@@ -71,15 +118,13 @@ end
 
 
 local function main()
-	if width % 2 ~= 0 then
-		error("Width must be even")
-		return
-	end
+	width = math.ceil(width / 2)
 
 	while true do
 		farmField()
 
 		returnAfterfarm()
+		tryMakeBread()
 
 		wait(waitTime)
 	end
